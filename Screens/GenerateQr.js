@@ -4,6 +4,7 @@ import {
   Button,
   Center,
   IconButton,
+  Spinner,
   Text,
   WarningOutlineIcon,
 } from 'native-base';
@@ -35,15 +36,13 @@ const GenerateQr = ({navigation}) => {
     },
   });
   useEffect(() => {
-    if (collegeName.length === 0) {
-      setShowQr(false);
-    }
     QrImageData?.toDataURL(data => {
       setQrImage('data:image/png;base64,' + data);
     });
-  }, [collegeName, QrImage]);
+  }, [QrImage]);
 
   const submitHandler = () => {
+    setShowQr(true);
     const uid = auth?.currentUser.uid;
     const q = query(collection(db, 'collegeAdmins'), where('uid', '==', uid));
     onSnapshot(q, snapshot => {
@@ -52,8 +51,6 @@ const GenerateQr = ({navigation}) => {
         setCollegeName(data);
       });
     });
-
-    setShowQr(true);
   };
 
   const saveHandler = async () => {
@@ -80,7 +77,7 @@ const GenerateQr = ({navigation}) => {
           });
         })
         .catch(errorMessage =>
-          Alert.alert('Thereis some problem in saving file right now'),
+          Alert.alert('There is some problem in saving file right now'),
         );
     }
     if (Platform.OS === 'ios') {
@@ -108,31 +105,14 @@ const GenerateQr = ({navigation}) => {
       Alert.alert('Error', 'Something went wrong');
     }
   };
+
+  const handlePress = () => {
+    navigation.navigate('AttendanceList');
+  };
   return (
     <>
       <Center w="100%">
         <Box safeArea p="2" paddingBottom={'8'} paddingTop="4" w="90%">
-          {/* <FormControl
-            marginBottom={5}
-            isRequired
-            isInvalid={collegeNameRequired && collegeName == ''}>
-            <FormControl.Label>College name:</FormControl.Label>
-            <Input
-              isFocused={true}
-              fontSize={16}
-              type="text"
-              variant="underlined"
-              value={collegeName}
-              onChangeText={val => {
-                setCollegeName(val);
-              }}
-              placeholder="Enter college name"
-            />
-            <FormControl.ErrorMessage
-              leftIcon={<WarningOutlineIcon size="xs" />}>
-              College name is required
-            </FormControl.ErrorMessage>
-          </FormControl> */}
           <Button
             android_ripple={{
               color: 'white',
@@ -141,20 +121,20 @@ const GenerateQr = ({navigation}) => {
             onPress={() => submitHandler()}
             padding={3}
             variant={'solid'}>
-            <Text color={'white'}>Generate QR Code</Text>
+            <Text color={'white'}>Get Your QR Code</Text>
           </Button>
           <Button
             android_ripple={{
               color: 'white',
             }}
             marginBottom={5}
-            onPress={() => navigation.navigate('AttendanceList')}
+            onPress={() => handlePress()}
             padding={3}
             variant={'solid'}>
             <Text color={'white'}>Get Attendance List</Text>
           </Button>
-          {!showQr ? (
-            <></>
+          {!collegeName ? (
+            <Center>{showQr ? <Spinner color="green.500" /> : <></>}</Center>
           ) : (
             <Center w={'100%'}>
               <Box p="2" paddingBottom={'8'} paddingTop="4">
