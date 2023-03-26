@@ -4,6 +4,8 @@ QR Generator is a mobile application built using React Native that enables users
 
 This app was build for generating QR code for the [ScanAndGo](https://github.com/chetan-2002/ScanAndGo) project.
 
+## Working App Can be found here : https://drive.google.com/file/d/13N2wzMuxkg13YY47FBb0O-4BmKUwU6MW/view?usp=share_link
+
 ## Technologies
 
 - React Native
