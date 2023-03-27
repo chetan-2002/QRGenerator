@@ -7,7 +7,7 @@ import Signup from '../Screens/Signup';
 
 const Stack = createStackNavigator();
 
-const MyStack = ({navigation}) => {
+const MyStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
