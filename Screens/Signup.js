@@ -22,6 +22,7 @@ import {Alert, ScrollView} from 'react-native';
 import assets from '../assets';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {addDoc, collection} from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Signup = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -34,6 +35,12 @@ const Signup = ({navigation}) => {
   const [nameRequired, setNameRequired] = useState(false);
   const [collegeNameRequired, setCollegeNameRequired] = useState(false);
   const [show, setShow] = useState(false);
+
+  const setAsyncStorage = async uid => {
+    await AsyncStorage.setItem('UID', user.uid)
+      .then(() => {})
+      .catch(error => console.log(error));
+  };
 
   const signupHandler = () => {
     if (name === '') {
@@ -57,6 +64,7 @@ const Signup = ({navigation}) => {
       .then(userCredential => {
         const user = userCredential.user;
         navigation.replace('GenerateQR');
+        setAsyncStorage(user.uid);
         addDoc(collection(db, 'collegeAdmins'), {
           name: name,
           email: email,

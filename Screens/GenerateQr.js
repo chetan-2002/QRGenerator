@@ -15,6 +15,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import {auth, db} from '../firebase-config';
 import Share from 'react-native-share';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const GenerateQr = ({navigation}) => {
   const [collegeName, setCollegeName] = useState('');
@@ -22,12 +23,23 @@ const GenerateQr = ({navigation}) => {
   const [QrImage, setQrImage] = useState(null);
   const [QrImageData, setQrImageData] = useState(null);
 
+  const removeItem = async () => {
+    await AsyncStorage.removeItem('UID')
+      .then(() => {
+        navigation.navigate('Login');
+      })
+      .catch(error => console.log(error));
+  };
+
   navigation.setOptions({
     headerRight: () => {
       return (
         <>
           <IconButton
-            onPress={() => navigation.replace('Login')}
+            onPress={() => {
+              removeItem();
+              // navigation.navigate('Login');
+            }}
             icon={
               <MaterialIcons name="logout" size={25} color="black" />
             }></IconButton>
@@ -39,18 +51,26 @@ const GenerateQr = ({navigation}) => {
     QrImageData?.toDataURL(data => {
       setQrImage('data:image/png;base64,' + data);
     });
-  }, [QrImage]);
+  });
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     setShowQr(true);
-    const uid = auth?.currentUser.uid;
-    const q = query(collection(db, 'collegeAdmins'), where('uid', '==', uid));
-    onSnapshot(q, snapshot => {
-      snapshot.docs.forEach(doc => {
-        const data = doc.data().collegeName;
-        setCollegeName(data);
-      });
-    });
+
+    await AsyncStorage.getItem('UID')
+      .then(uid => {
+        const q = query(
+          collection(db, 'collegeAdmins'),
+          where('uid', '==', uid),
+        );
+        onSnapshot(q, snapshot => {
+          snapshot.docs.forEach(doc => {
+            const data = doc.data().collegeName;
+            setCollegeName(data);
+          });
+        });
+      })
+      .catch(error => console.log(error));
+    // const uid = auth?.currentUser.uid;
   };
 
   const saveHandler = async () => {
@@ -150,6 +170,7 @@ const GenerateQr = ({navigation}) => {
                   android_ripple={{
                     color: 'white',
                   }}
+                  isDisabled={QrImage === null ? true : false}
                   onPress={() => saveHandler()}
                   style={{
                     marginTop: 20,
@@ -163,6 +184,7 @@ const GenerateQr = ({navigation}) => {
                   android_ripple={{
                     color: 'white',
                   }}
+                  isDisabled={QrImage === null ? true : false}
                   style={{
                     marginTop: 15,
                     padding: 6,
