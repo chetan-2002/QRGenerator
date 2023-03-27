@@ -37,7 +37,7 @@ const Signup = ({navigation}) => {
   const [show, setShow] = useState(false);
 
   const setAsyncStorage = async uid => {
-    await AsyncStorage.setItem('UID', user.uid)
+    await AsyncStorage.setItem('UID', uid)
       .then(() => {})
       .catch(error => console.log(error));
   };
